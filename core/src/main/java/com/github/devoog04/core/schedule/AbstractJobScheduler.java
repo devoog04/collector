@@ -6,7 +6,6 @@ import com.github.devoog04.core.schedule.exception.DuplicateScheduleException;
 import com.github.devoog04.core.schedule.exception.JobSchedulerException;
 import com.github.devoog04.core.schedule.exception.NotFoundScheduleException;
 import com.github.devoog04.core.schedule.exception.ScheduleExecutionException;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +38,8 @@ public abstract class AbstractJobScheduler implements JobScheduler {
     protected final Map<JobDefinitionKey, ScheduleManager> container = new ConcurrentHashMap<>();
 
     @Override
-    public final void schedule(JobDefinition definition, SchedulePolicy policy) {
+    public void schedule(JobDefinition definition, SchedulePolicy policy)
+            throws DuplicateScheduleException, ScheduleExecutionException {
         container.compute(definition.getKey(), (k, oldManager) -> {
             // 기존 manager 미존재
             if (oldManager == null) {
@@ -60,7 +60,8 @@ public abstract class AbstractJobScheduler implements JobScheduler {
     }
 
     @Override
-    public void reschedule(JobDefinitionKey key, SchedulePolicy newPolicy) {
+    public void reschedule(JobDefinitionKey key, SchedulePolicy newPolicy)
+            throws NotFoundScheduleException, ScheduleExecutionException {
         AtomicReference<JobSchedulerException> exceptionRef = new AtomicReference<>();
 
         container.compute(key, (k, oldManager) -> {
@@ -111,7 +112,8 @@ public abstract class AbstractJobScheduler implements JobScheduler {
     }
 
     @Override
-    public void unschedule(JobDefinitionKey key) {
+    public void unschedule(JobDefinitionKey key)
+            throws ScheduleExecutionException {
         container.compute(key, (k, oldManager) -> {
             // 기존 manager 존재
             if (oldManager != null) {
@@ -139,12 +141,17 @@ public abstract class AbstractJobScheduler implements JobScheduler {
      */
     abstract protected ScheduleManager createManager(JobDefinition definition, SchedulePolicy policy) throws ScheduleExecutionException;
 
+    /**
+     * 개별 작업의 실행 상태를 관리하고 스케줄링 엔진(Spring, Quartz 등)과 상호작용하는 추상 클래스입니다.
+     * <p>이 클래스는 <b>상태 전이의 원자성</b>을 보장하며, 중복 실행이나 중복 취소를 방지합니다.</p>
+     */
     @Getter
     @RequiredArgsConstructor
     protected abstract static class ScheduleManager {
+        /** 현재 작업이 스케줄러에 의해 실행 중인지 여부를 나타내는 상태 변수 */
         private final AtomicBoolean scheduled = new AtomicBoolean(false);
-        private final JobDefinition jobDefinition;
-        private final SchedulePolicy policy;
+        protected final JobDefinition jobDefinition;
+        protected final SchedulePolicy policy;
 
         public final void schedule() throws ScheduleExecutionException {
             if (scheduled.compareAndSet(false, true)) {

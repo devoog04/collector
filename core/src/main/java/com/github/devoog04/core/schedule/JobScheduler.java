@@ -19,11 +19,12 @@ public interface JobScheduler {
      * <li>"중복 체크"와 "실제 등록"은 원자적으로 수행되어야 하며, 등록 실패 시 컨테이너 상태가 변경되어서는 안 됩니다.</li>
      * </ul>
      * @param definition     작업 식별 정보 및 실행 로직을 담은 객체
-     * @param schedulePolicy 적용할 스케줄 정책
+     * @param policy 적용할 스케줄 정책
      * @throws DuplicateScheduleException 이미 동일한 키가 등록된 경우
      * @throws ScheduleExecutionException 작업 스케줄 등록 과정에서 치명적 오류가 발생한 경우
      */
-    void schedule(JobDefinition definition, SchedulePolicy schedulePolicy);
+    void schedule(JobDefinition definition, SchedulePolicy policy)
+        throws DuplicateScheduleException, ScheduleExecutionException;
 
     /**
      * 기존에 등록된 작업의 스케줄 정책을 변경합니다.
@@ -38,7 +39,8 @@ public interface JobScheduler {
      * @throws NotFoundScheduleException  대상 키가 존재하지 않을 경우
      * @throws ScheduleExecutionException 작업 스케줄 중단 또는 등록 과정에서 치명적 오류가 발생한 경우
      */
-    void reschedule(JobDefinitionKey key, SchedulePolicy newPolicy);
+    void reschedule(JobDefinitionKey key, SchedulePolicy newPolicy)
+            throws NotFoundScheduleException, ScheduleExecutionException;
 
     /**
      * 스케줄러에서 특정 작업을 제거하고 즉시 중지합니다.
@@ -50,5 +52,6 @@ public interface JobScheduler {
      * @param key 대상 작업의 고유 키
      * @throws ScheduleExecutionException 작업 스케줄 중단 과정에서 치명적 오류가 발생한 경우
      */
-    void unschedule(JobDefinitionKey key);
+    void unschedule(JobDefinitionKey key)
+        throws ScheduleExecutionException;
 }
