@@ -2,17 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.1.0-SNAPSHOT</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>com.github.devoog04</groupId>
-	<artifactId>spring-boot-examples</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <parent>
+        <groupId>com.github.devoog04</groupId>
+        <artifactId>collector</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>spring-boot-examples</artifactId>
 	<name>spring-boot-examples</name>
 	<description>Demo project for Spring Boot</description>
+
 	<url/>
 	<licenses>
 		<license/>
@@ -28,6 +27,19 @@
 	</scm>
 	<properties>
 	</properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>4.1.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -36,7 +48,7 @@
 
         <dependency>
             <groupId>com.github.devoog04</groupId>
-            <artifactId>spring-boot-starter-collector</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
